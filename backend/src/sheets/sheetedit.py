@@ -13,7 +13,7 @@ from googleapiclient.errors import HttpError
 class SheetEditClass:
     def __init__(self):
         self.SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-        self.SPREADSHEET_ID = "1khGexPl2cTuwudNEVCHco6W7xxfu8IJQxx4Sr1IuRlk"
+        self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA"
         self.app = Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
@@ -63,7 +63,7 @@ class SheetEditClass:
                 # Fetch sheet data
                 service = build("sheets", "v4", credentials=credentials)
                 sheets = service.spreadsheets()
-                result = sheets.values().get(spreadsheetId=self.SPREADSHEET_ID, range="May-2024!B2:H9").execute()
+                result = sheets.values().get(spreadsheetId=self.SPREADSHEET_ID, range="expenses!A:G").execute()
                 values = result.get('values', [])
                 
                 return jsonify(values)
