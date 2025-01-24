@@ -1,6 +1,6 @@
 export default function SheetTable({ infoSheet }) {
     return (
-        <table className='table-auto w-full shadow-md rounded border-separate border-spacing-y-4 bg-stone-900'>
+        <table className='table-auto w-full shadow-md rounded border-separate border-spacing-y-4 bg-stone-900 border-stone-600 border-2'>
             <thead>
                 <tr className='border-y-2 text-white'>
                     {infoSheet[0]?.map((header) => (
