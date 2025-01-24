@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchSpreadSheet } from "../src/responses/http"
+import { fetchSpreadSheet } from "../responses/http"
 import LoadingText from "./LoadingText"
 import ErrorPage from "./ErrorPage"
 import SheetTable from "./SheetTable"

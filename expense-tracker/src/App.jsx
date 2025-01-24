@@ -1,10 +1,10 @@
 import './index.css'
-import Header from '../components/Header';
-import DataInsert from '../components/DataInsert';
-import MainSection from '../components/MainSection';
+import Header from './components/Header';
+import DataInsert from './components/DataInsert';
+import MainSection from './components/MainSection';
 
 function App() {
-
+  {/*FOR THE FURUTURE ME: PUT the components INSIDE the src folder*/}
   return (
     <>
       <Header />

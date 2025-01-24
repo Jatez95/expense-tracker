@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import date
 
 from flask import Flask, jsonify
 from flask_cors import CORS
@@ -68,6 +69,72 @@ class SheetEditClass:
                 
                 return jsonify(values)
 
+            except Exception as e:
+                print(f"Full error details: {e}")
+                return jsonify({"error": str(e)}), 500
+            
+        
+        @self.app.route("/insert-sheet", methods=["POST"])
+        def update_values(**kwargs):
+            """Function to see the chart"""
+            credentials = None
+            try:
+                # Existing token check
+                if os.path.exists("token.json"):
+                    try:
+                        credentials = Credentials.from_authorized_user_file("token.json", self.SCOPES) # save credentials on a variable 
+                    except ValueError as ve:
+                        print(f"Token file error: {ve}")
+                        credentials = None
+
+                
+                if not credentials or not credentials.valid:
+                    if credentials and credentials.expired and credentials.refresh_token:
+                        try:
+                            credentials.refresh(Request()) #Ask for new credentials
+                        except Exception as refresh_error:
+                            print(f"Refresh error: {refresh_error}")
+                            credentials = None
+
+                    if not credentials: # Search for the credentials
+                        path_credentials = Path("C:/Users/xxjav/Documents/python_things/google-drive-things/src/sheets/credentials/credentials.json")
+                        print(f"Looking for credentials at: {path_credentials}") 
+                        
+                        if not os.path.exists(path_credentials):
+                            raise FileNotFoundError(f"Credentials file not found at {path_credentials}")
+
+                        flow = InstalledAppFlow.from_client_secrets_file(path_credentials, self.SCOPES)
+                        credentials = flow.run_local_server( #Ask for authorize access to use the Google API
+                            port=50701, 
+                            authorization_prompt_message='Please authorize access',
+                            prompt='consent'  # Force new token generation
+                        )
+
+                # Save new or refreshed credentials
+                with open("token.json", "w") as token:
+                    token.write(credentials.to_json())
+                
+                request = request.get_json()
+                print(request)
+            
+                service = build("sheets", "v4", credentials=credentials)
+                values =[
+                    [date.today().strftime("%d/%m/%Y"), "187€", "=B4-E4", "RedBull 6", "5,50", "30%", "Gastos Personales"]
+                ]
+                body = {"values": values}
+                result = (
+                    service.spreadsheets()
+                    .values()
+                    .append(
+                        spreadsheetId=self.SPREADSHEET_ID,
+                        range="expenses!A:G",
+                        valueInputOption="USER_ENTERED",
+                        body=body,
+                    )
+                    .execute()
+                )
+                print(f"{(result.get('updates').get('updatedCells'))} cells appended.")
+                return result
             except Exception as e:
                 print(f"Full error details: {e}")
                 return jsonify({"error": str(e)}), 500
