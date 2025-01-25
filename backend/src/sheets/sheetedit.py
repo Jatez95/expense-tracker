@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from datetime import date
 
-from flask import Flask, jsonify
+import flask
 from flask_cors import CORS
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -15,7 +15,7 @@ class SheetEditClass:
     def __init__(self):
         self.SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
         self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA"
-        self.app = Flask(__name__)
+        self.app = flask.Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
     
@@ -67,11 +67,11 @@ class SheetEditClass:
                 result = sheets.values().get(spreadsheetId=self.SPREADSHEET_ID, range="expenses!A:G").execute()
                 values = result.get('values', [])
                 
-                return jsonify(values)
+                return flask.jsonify(values)
 
             except Exception as e:
                 print(f"Full error details: {e}")
-                return jsonify({"error": str(e)}), 500
+                return flask.jsonify({"error": str(e)}), 500
             
         
         @self.app.route("/insert-sheet", methods=["POST"])
@@ -114,13 +114,29 @@ class SheetEditClass:
                 with open("token.json", "w") as token:
                     token.write(credentials.to_json())
                 
-                request = request.get_json()
+                request = flask.request.get_json()
                 print(request)
-            
+              
+                
                 service = build("sheets", "v4", credentials=credentials)
-                values =[
-                    [date.today().strftime("%d/%m/%Y"), "187€", "=B4-E4", "RedBull 6", "5,50", "30%", "Gastos Personales"]
-                ]
+
+                if request["dataValues"][3] == "50% (Gastos previstos)":
+                    values =[
+                        [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "50%", "Gastos Previstos"]
+                    ]
+                elif request["dataValues"][3] == "30% (Gastos personales)":
+                    values =[
+                        [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "30%", "Gastos personales"]
+                    ] 
+                elif request["dataValues"][3] == "20% (De la parte de ahorro)":
+                    values =[
+                        [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "20%", "Ahorro"]
+                    ]
+                elif request["dataValues"][3] == "Añadir":
+                    values =[
+                        [date.today().strftime("%d/%m/%Y"), request["dataValues"][0], "=B-E", "Añadido", " ", " ", "Añadido"]
+                    ]
+
                 body = {"values": values}
                 result = (
                     service.spreadsheets()
@@ -137,7 +153,7 @@ class SheetEditClass:
                 return result
             except Exception as e:
                 print(f"Full error details: {e}")
-                return jsonify({"error": str(e)}), 500
+                return request.jsonify({"error": str(e)}), 500
     
     def run(self, debug = False):
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'

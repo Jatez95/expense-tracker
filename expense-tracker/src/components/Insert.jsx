@@ -1,4 +1,4 @@
-export default function Insert({ label_title, input_placeholder, isSelect, userInsert }) {
+export default function Insert({ label_title, input_placeholder, isSelect, userInsert, inputType }) {
     return (
         <div className="flex flex-col w-full m-3">
             <label className='text-white'>{label_title}</label>
@@ -9,7 +9,7 @@ export default function Insert({ label_title, input_placeholder, isSelect, userI
                     <option>20% (De la parte de ahorro)</option>
                     <option>Añadir</option>
                 </select> :
-                <input className='rounded mr-1 border-2 border-stone-900' placeholder={input_placeholder} ref={userInsert}/>
+                <input type={inputType} className='rounded mr-1 border-2 border-stone-900' placeholder={input_placeholder} ref={userInsert}/>
             }
 
         </div>
