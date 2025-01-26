@@ -23,7 +23,6 @@ class SheetEditClass:
         ]
 
         self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA"
-        self.prefix = 'https://drive.google.com/uc?/export=download&id='
         self.app = flask.Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
