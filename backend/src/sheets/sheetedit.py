@@ -2,11 +2,8 @@ import os
 import io
 from pathlib import Path
 from datetime import date
-from typing import Final
-import pickle
 
-import gdown
-import flask
+import flask # import only flask to use flask.module for the overlapped modules
 from flask_cors import CORS
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -14,7 +11,6 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
-from dotenv import load_dotenv
 
 
 
@@ -80,7 +76,7 @@ class SheetEditClass:
                 result = sheets.values().get(spreadsheetId=self.SPREADSHEET_ID, range="expenses!A:G").execute()
                 values = result.get('values', [])
                 
-                return flask.jsonify(values)
+                return flask.jsonify(values) # Everytime you reload the page this is what you get
 
             except Exception as e:
                 print(f"Full error details: {e}")
@@ -89,7 +85,7 @@ class SheetEditClass:
         
         @self.app.route("/insert-sheet", methods=["POST"])
         def update_values(**kwargs):
-            """Function to see the chart"""
+            """Function to insert data to the chart"""
             credentials = None
             try:
                 # Existing token check
@@ -132,11 +128,13 @@ class SheetEditClass:
               
                 
                 service = build("sheets", "v4", credentials=credentials)
-
+                
+                #Genious idea for the select options on the fronend the only problem us the use of formulas
                 if request["dataValues"][3] == "50% (Gastos previstos)":
                     values =[
                         [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "50%", "Gastos Previstos"]
-                    ]
+                    ] # with the formula there is a problem when updating table shows #NAME? or something
+                    # TODO fix it one day i guess
                 elif request["dataValues"][3] == "30% (Gastos personales)":
                     values =[
                         [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "30%", "Gastos personales"]
@@ -162,6 +160,7 @@ class SheetEditClass:
                     )
                     .execute()
                 )
+
                 print(f"{(result.get('updates').get('updatedCells'))} cells appended.")
                 return result
             except Exception as e:
@@ -171,6 +170,7 @@ class SheetEditClass:
         
         @self.app.route("/download-sheet", methods=["GET"])
         def download_sheet():
+            """Download the google sheet"""
             credentials = None
             try:
                 # Existing token check
@@ -212,7 +212,6 @@ class SheetEditClass:
 
                 file_id = self.SPREADSHEET_ID
 
-                # pylint: disable=maybe-no-member
                 request = service.files().export_media(
                     fileId=file_id,
                     mimeType='text/csv'
@@ -220,22 +219,20 @@ class SheetEditClass:
 
                 file_name = "expenses.csv"
                 file_content = request.execute()
-                file = io.BytesIO(file_content)
+                file = io.BytesIO(file_content) # The file here needs to be decoded or will be broken af
 
-                decoded_content = file_content.decode('utf-8')
-                file = io.BytesIO(decoded_content.encode('utf-8'))
+                decoded_content = file_content.decode('utf-8') 
+                file = io.BytesIO(decoded_content.encode('utf-8')) # UTF-8 encode to our language and not strange symbols
                 downloader = MediaIoBaseDownload(file, request)
                 done = False
-                while done is False:
+                while done is False: # Dont know why google recomend this but i will use it
                     status, done = downloader.next_chunk()
-                    print(f"Download {int(status.progress() * 100)}.")
+                    print(f"Download {int(status.progress() * 100)}.") 
                 
                 file.seek(0)
-                return flask.send_file(
+                return flask.send_file( # claude.ai helped me but not that much
                     file, as_attachment = True, download_name = file_name
                 )
-
-                
                 
             except HttpError as error:
                 print(f"An error ocurred: {error}")
@@ -243,5 +240,6 @@ class SheetEditClass:
         
     
     def run(self, debug = False):
+        """initialize the backend if run is clicked on main"""
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         self.app.run(debug = debug)

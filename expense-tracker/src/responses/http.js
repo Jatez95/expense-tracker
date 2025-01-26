@@ -18,6 +18,7 @@ export async function updateSpreadSheet(dataValues) {
         }
     })
 
+
     const resData = await response.json()
 
     if (!response.ok) {
@@ -33,6 +34,10 @@ export async function fetchDownloadSheet() {
     if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
+
+    //claude.ai was here
+
+    // didnt know how to fix an error -> http.js?t=1737914950667:39 SyntaxError: Unexpected token 'F', "Fecha,Cant"... is not valid JSON
 
     const blob = await response.blob();
 
