@@ -19,6 +19,11 @@ para el uso de esta app en todas las funciones del backend comprobara que el tok
 ATENCION: Para usar el proyecto tienes que instalar varias cosas: 1- Node.js para usar el frontend escrito en react;
 2- Python 3.x; 3- las dependencias que hay en requeriments.txt (pip install -r requeriments.txt)
 
+Tambien tienes que cambiar una variable para el uso de la hoja de calculo que es el (self.SPREADSHEET_ID = "Your SheetId")
+
+este id se obtiene en el enlace de la hoja de calculo: 
+https://docs.google.com/spreadsheets/d/(ID)/edit?gid=0#gid=0
+
 El uso del frontend es sencillo, solo se puede visualizar, insertar y descargar 
 
 IMPORTANT: this project is not intended to be uploaded to servers, nor for mobile use [it is not responsive].
@@ -39,5 +44,10 @@ for the use of this app in all the functions of the backend it will check that t
 
 ATTENTION: To use the project you have to install several things: 1- Node.js to use the frontend written in react;
 2- Python 3.x; 3- the dependencies that are in requeriments.txt (pip install -r requeriments.txt)
+
+You have to change aswell a variable for the use of the spreadsheet (self.SPREADSHEET_ID = "Your SheetId")
+
+You can obtain the ID of the spreadsheet in the spreadshit link:
+(https://docs.google.com/spreadsheets/d/(ID)/edit?gid=0#gid=0)
 
 The use of the frontend is simple, you can only visualize, insert and download it. 

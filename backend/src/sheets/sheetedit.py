@@ -22,7 +22,7 @@ class SheetEditClass:
             "https://www.googleapis.com/auth/drive.readonly"
         ]
 
-        self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA"
+        self.SPREADSHEET_ID = "Your SheetId"
         self.app = flask.Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
