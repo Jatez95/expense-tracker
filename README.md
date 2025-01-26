@@ -41,5 +41,3 @@ ATTENTION: To use the project you have to install several things: 1- Node.js to 
 2- Python 3.x; 3- the dependencies that are in requeriments.txt (pip install -r requeriments.txt)
 
 The use of the frontend is simple, you can only visualize, insert and download it. 
-
-Translated with DeepL.com (free version)
