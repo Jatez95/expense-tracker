@@ -1,7 +1,11 @@
 import os
+import io
 from pathlib import Path
 from datetime import date
+from typing import Final
+import pickle
 
+import gdown
 import flask
 from flask_cors import CORS
 from google.auth.transport.requests import Request
@@ -9,12 +13,21 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaIoBaseDownload
+from dotenv import load_dotenv
+
 
 
 class SheetEditClass:
     def __init__(self):
-        self.SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+        self.SCOPES = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            'https://www.googleapis.com/auth/drive',
+            "https://www.googleapis.com/auth/drive.readonly"
+        ]
+
         self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA"
+        self.prefix = 'https://drive.google.com/uc?/export=download&id='
         self.app = flask.Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
@@ -154,6 +167,80 @@ class SheetEditClass:
             except Exception as e:
                 print(f"Full error details: {e}")
                 return request.jsonify({"error": str(e)}), 500
+        
+        
+        @self.app.route("/download-sheet", methods=["GET"])
+        def download_sheet():
+            credentials = None
+            try:
+                # Existing token check
+                if os.path.exists("token.json"):
+                    try:
+                        credentials = Credentials.from_authorized_user_file("token.json", self.SCOPES) # save credentials on a variable 
+                    except ValueError as ve:
+                        print(f"Token file error: {ve}")
+                        credentials = None
+
+                
+                if not credentials or not credentials.valid:
+                    if credentials and credentials.expired and credentials.refresh_token:
+                        try:
+                            credentials.refresh(Request()) #Ask for new credentials
+                        except Exception as refresh_error:
+                            print(f"Refresh error: {refresh_error}")
+                            credentials = None
+
+                    if not credentials: # Search for the credentials
+                        path_credentials = Path("C:/Users/xxjav/Documents/python_things/google-drive-things/src/sheets/credentials/credentials.json")
+                        print(f"Looking for credentials at: {path_credentials}") 
+                        
+                        if not os.path.exists(path_credentials):
+                            raise FileNotFoundError(f"Credentials file not found at {path_credentials}")
+
+                        flow = InstalledAppFlow.from_client_secrets_file(path_credentials, self.SCOPES)
+                        credentials = flow.run_local_server( #Ask for authorize access to use the Google API
+                            port=50701, 
+                            authorization_prompt_message='Please authorize access',
+                            prompt='consent'  # Force new token generation
+                        )
+
+                # Save new or refreshed credentials
+                with open("token.json", "w") as token:
+                    token.write(credentials.to_json())
+
+                service = build("drive", "v3", credentials=credentials)
+
+                file_id = self.SPREADSHEET_ID
+
+                # pylint: disable=maybe-no-member
+                request = service.files().export_media(
+                    fileId=file_id,
+                    mimeType='text/csv'
+                )
+
+                file_name = "expenses.csv"
+                file_content = request.execute()
+                file = io.BytesIO(file_content)
+
+                decoded_content = file_content.decode('utf-8')
+                file = io.BytesIO(decoded_content.encode('utf-8'))
+                downloader = MediaIoBaseDownload(file, request)
+                done = False
+                while done is False:
+                    status, done = downloader.next_chunk()
+                    print(f"Download {int(status.progress() * 100)}.")
+                
+                file.seek(0)
+                return flask.send_file(
+                    file, as_attachment = True, download_name = file_name
+                )
+
+                
+                
+            except HttpError as error:
+                print(f"An error ocurred: {error}")
+                return None
+        
     
     def run(self, debug = False):
         os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
