@@ -1,6 +1,7 @@
 import './index.css'
 import Header from './components/Header';
 import DataInsert from './components/DataInsert';
+// import DataInsertDifferent from "./components/DataInsertDifferent"
 import MainSection from './components/MainSection';
 
 function App() {

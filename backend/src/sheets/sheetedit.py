@@ -22,7 +22,7 @@ class SheetEditClass:
             "https://www.googleapis.com/auth/drive.readonly"
         ]
 
-        self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA" # Your Id
+        self.SPREADSHEET_ID = "Your Id" # Your Id
         self.app = flask.Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
@@ -52,7 +52,7 @@ class SheetEditClass:
                             credentials = None
 
                     if not credentials: # Search for the credentials
-                        path_credentials = Path("C:/Users/xxjav/Documents/python_things/google-drive-things/src/sheets/credentials/credentials.json")
+                        path_credentials = Path("Your credentials")
                         print(f"Looking for credentials at: {path_credentials}") 
                         
                         if not os.path.exists(path_credentials):
@@ -105,7 +105,7 @@ class SheetEditClass:
                             credentials = None
 
                     if not credentials: # Search for the credentials
-                        path_credentials = Path("C:/Users/xxjav/Documents/python_things/google-drive-things/src/sheets/credentials/credentials.json")
+                        path_credentials = Path("Your credentials")
                         print(f"Looking for credentials at: {path_credentials}") 
                         
                         if not os.path.exists(path_credentials):
@@ -128,7 +128,7 @@ class SheetEditClass:
                 
                 service = build("sheets", "v4", credentials=credentials)
                 
-                #Genious idea for the select options on the fronend the only problem us the use of formulas
+                #Genious idea for the select options on the frontend
                 if request["dataValues"][3] == "50% (Gastos previstos)":
                     values = [
                         [
@@ -176,7 +176,6 @@ class SheetEditClass:
                             " ",
                             "Añadido"
                         ]
-                        [date.today().strftime("%d/%m/%Y"), request["dataValues"][0], "=B-E", "Añadido", " ", " ", "Añadido"]
                     ]
 
                 body = {"values": values}
@@ -222,7 +221,7 @@ class SheetEditClass:
                             credentials = None
 
                     if not credentials: # Search for the credentials
-                        path_credentials = Path("C:/Users/xxjav/Documents/python_things/google-drive-things/src/sheets/credentials/credentials.json")
+                        path_credentials = Path("Your credentials.json")
                         print(f"Looking for credentials at: {path_credentials}") 
                         
                         if not os.path.exists(path_credentials):

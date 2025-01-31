@@ -13,16 +13,18 @@ export default function DataInsert() {
     // const [dataValues, setdataValues] = useState([])
 
     async function handleValues(event) {
+        event.preventDefault();
         const fd = new FormData(event.target);
+        const acquisitionChannel = fd.getAll('acquisition')
         const data = Object.fromEntries(fd.entries());
+        data.acquisition = acquisitionChannel
         console.log(data)
-        if (data.trim() !== "") {
-            // setdataValues([monthQuantity.current.value, descExpense.current.value, quantityExpensed.current.value, category.current.value])
-            try {
-                await updateSpreadSheet(data)
-            } catch (error) {
-                console.log(`An error has ocurred sending the data: ${error}`)
-            }
+        data.jsonify()
+
+        try {
+            await updateSpreadSheet(data)
+        } catch (error) {
+            console.log(`An error has ocurred sending the data: ${error}`)
         }
 
         // if (monthQuantity.current && monthQuantity.current.value.trim() !== "" &&
