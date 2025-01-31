@@ -22,7 +22,7 @@ class SheetEditClass:
             "https://www.googleapis.com/auth/drive.readonly"
         ]
 
-        self.SPREADSHEET_ID = "Your SheetId"
+        self.SPREADSHEET_ID = "1IH9uOjaugzWZhqCEGfyf7B3Qe4uB9TjmMMmIpm5KzeA" # Your Id
         self.app = flask.Flask(__name__)
         self.cors = CORS(self.app)
         self.init_routes()
@@ -130,20 +130,52 @@ class SheetEditClass:
                 
                 #Genious idea for the select options on the fronend the only problem us the use of formulas
                 if request["dataValues"][3] == "50% (Gastos previstos)":
-                    values =[
-                        [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "50%", "Gastos Previstos"]
-                    ] # with the formula there is a problem when updating table shows #NAME? or something
-                    # TODO fix it one day i guess
+                    values = [
+                        [
+                            date.today().strftime("%d/%m/%Y"),
+                            request["dataValues"][0],
+                            '=INDIRECT("B"&ROW())-INDIRECT("E"&ROW())',
+                            request["dataValues"][1],
+                            request["dataValues"][2],  
+                            "50%",
+                            "Gastos Previstos"
+                        ]
+                    ]
                 elif request["dataValues"][3] == "30% (Gastos personales)":
-                    values =[
-                        [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "30%", "Gastos personales"]
+                    values = [
+                        [
+                            date.today().strftime("%d/%m/%Y"),
+                            request["dataValues"][0],  #
+                            '=INDIRECT("B"&ROW())-INDIRECT("E"&ROW())',
+                            request["dataValues"][1],
+                            request["dataValues"][2],
+                            "30%",
+                            "Gastos personales"
+                        ]
                     ] 
                 elif request["dataValues"][3] == "20% (De la parte de ahorro)":
                     values =[
-                        [date.today().strftime("%d/%m/%Y"), f"{request["dataValues"][0]}€", "=B-E", request["dataValues"][1], f"{request["dataValues"][2]}€", "20%", "Ahorro"]
+                        [
+                            date.today().strftime("%d/%m/%Y"),
+                            request["dataValues"][0],  #
+                            '=INDIRECT("B"&ROW())-INDIRECT("E"&ROW())',
+                            request["dataValues"][1],
+                            request["dataValues"][2],
+                            "20%",
+                            "Gastos personales"
+                        ]
                     ]
                 elif request["dataValues"][3] == "Añadir":
                     values =[
+                        [
+                            date.today().strftime("%d/%m/%Y"),
+                            request["dataValues"][0],  #
+                            '=INDIRECT("B"&ROW())-INDIRECT("E"&ROW())',
+                            "Añadido",
+                            " ",
+                            " ",
+                            "Añadido"
+                        ]
                         [date.today().strftime("%d/%m/%Y"), request["dataValues"][0], "=B-E", "Añadido", " ", " ", "Añadido"]
                     ]
 
